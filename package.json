@@ -1,0 +1,25 @@
+{
+  "name": "typoteka",
+  "version": "1.0.0",
+  "description": "Типотека",
+  "main": "./src/service/service.js",
+  "scripts": {
+    "start": "node ./src/service/service.js",
+    "test": "npm run eslint",
+    "eslint": "eslint --fix --ext .js src/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sergeytalyzin/1027869-typoteka-3.git"
+  },
+  "author": "sergey talyzin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sergeytalyzin/1027869-typoteka-3/issues"
+  },
+  "homepage": "https://github.com/sergeytalyzin/1027869-typoteka-3#readme",
+  "devDependencies": {
+    "eslint": "^7.12.1",
+    "eslint-config-htmlacademy": "0.6.0"
+  }
+}
