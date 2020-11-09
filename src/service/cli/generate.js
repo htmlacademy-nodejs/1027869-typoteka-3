@@ -1,25 +1,42 @@
 'use strict';
 const {getRandomInt, shuffle, createDate} = require(`../../utils`);
-const {CATEGORIES, ANNOUNCE, TITLES, DEFAULT_COUNT, FILE_NAME} = require(`../../constants`);
+const {DEFAULT_COUNT, FILE_NAME} = require(`../../constants`);
 const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
+const FILE_ANNOUNCE_PATH = `./data/announce.txt`;
+const FILE_TITLES_PATH = `./data/titles.txt`;
+const FILE_CATEGORIES_PATH = `./data/categories.txt`;
 
-const generateOffers = (count) => (
+const readContent = async (filePath) => {
+  try {
+    const content = await fs.readFile(filePath, `utf8`);
+    return content.split(`\n`);
+  } catch (e) {
+    console.error(chalk.red(e));
+    return [];
+  }
+};
+
+const generateOffers = (count, titles, categories, announce) => (
   new Array(count).fill(``).map(()=>({
-    category: [CATEGORIES[getRandomInt(0, CATEGORIES.length - 1)]],
-    announce: shuffle(ANNOUNCE).slice(1, 3).join(` `),
-    fullText: shuffle(ANNOUNCE).slice(1, 5).join(` `),
+    category: [categories[getRandomInt(0, categories.length - 1)]],
+    announce: shuffle(announce).slice(1, 3).join(` `),
+    fullText: shuffle(announce).slice(1, 5).join(` `),
     createdDate: createDate(),
-    title: TITLES[getRandomInt(0, TITLES.length - 1)],
+    title: titles[getRandomInt(0, titles.length - 1)],
   }))
 );
 
 module.exports = {
   name: `--generate`,
   async run(args) {
+    const titles = await readContent(FILE_TITLES_PATH);
+    const categories = await readContent(FILE_CATEGORIES_PATH);
+    const announce = await readContent(FILE_ANNOUNCE_PATH);
+
     const [count] = args;
     const countOffer = Number.parseInt(count, 10) || DEFAULT_COUNT;
-    const content = JSON.stringify(generateOffers(countOffer));
+    const content = JSON.stringify(generateOffers(countOffer, titles, categories, announce));
     try {
       await fs.writeFile(FILE_NAME, content);
       console.log(chalk.green(`Operation success. File created.`));
