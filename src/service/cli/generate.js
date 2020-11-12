@@ -10,7 +10,7 @@ const FILE_CATEGORIES_PATH = `./data/categories.txt`;
 const readContent = async (filePath) => {
   try {
     const content = await fs.readFile(filePath, `utf8`);
-    return content.split(`\n`);
+    return content.trim().split(`\n`);
   } catch (e) {
     console.error(chalk.red(e));
     return [];
@@ -36,7 +36,8 @@ module.exports = {
 
     const [count] = args;
     const countOffer = Number.parseInt(count, 10) || DEFAULT_COUNT;
-    const content = JSON.stringify(generateOffers(countOffer, titles, categories, announce));
+    const options = [countOffer, titles, categories, announce];
+    const content = JSON.stringify(generateOffers(...options));
     try {
       await fs.writeFile(FILE_NAME, content);
       console.log(chalk.green(`Operation success. File created.`));
