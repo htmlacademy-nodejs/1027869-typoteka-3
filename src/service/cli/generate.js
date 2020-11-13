@@ -36,7 +36,8 @@ module.exports = {
 
     const [count] = args;
     const countOffer = Number.parseInt(count, 10) || DEFAULT_COUNT;
-    const content = JSON.stringify(generateOffers(countOffer, titles, categories, announce));
+    const options = [countOffer, titles, categories, announce];
+    const content = JSON.stringify(generateOffers(...options));
     try {
       await fs.writeFile(FILE_NAME, content);
       console.log(chalk.green(`Operation success. File created.`));
