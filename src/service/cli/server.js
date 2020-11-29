@@ -1,27 +1,16 @@
 'use strict';
 
 const express = require(`express`);
-const http = require(`http`);
 const chalk = require(`chalk`);
-const fs = require(`fs`).promises;
-const {HttpCode} = require(`../../constants`);
-
+const {HttpCode, API_PREFIX} = require(`../../constants`);
+const routes = require(`../api`);
 const DEFAULT_PORT = 3000;
-const FILENAME = `mocks.json`;
+const getMockData = require(`../lib/get-mock-data`);
 
 const app = express();
-app.use(express.json())
+app.use(express.json());
+app.use(API_PREFIX, routes);
 
-app.get(`/posts`,async (req,res)=>{
-  try {
-    const fileContent = fs.readFile(FILENAME);
-    const mocks = JSON.parse(fileContent);
-    res.json(mocks);
-  }
-  catch (err) {
-    res.status(HttpCode.INTERNAL_SERVER_ERROR).send(err);
-  }
-})
 app.use((req, res) => res
   .status(HttpCode.NOT_FOUND)
   .send(`Not found`));
@@ -31,11 +20,17 @@ module.exports = {
   async run(args) {
     const [customPort] = args;
     const port = Number.parseInt(customPort, 10) || DEFAULT_PORT;
-    app.listen(port,(err)=>{
-      if(err) {
-        return console.error(`Ошибка при создании сервера`, err)
-      }
-      return console.info(chalk.green(`Ожидаю соединений на ${port}`))
-    })
+    try {
+      await getMockData();
+      app.listen(port, (err)=> {
+        if (err) {
+          return console.error(`Ошибка при создании сервера`, err);
+        }
+        return console.info(chalk.green(`Ожидаю соединений на ${port}`));
+      });
+    } catch (e) {
+      console.error(`Произошла ошибка: ${e.message}`);
+      process.exit(1);
+    }
   }
 };
